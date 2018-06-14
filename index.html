@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Canvas Test</title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400" style="border:1px solid #000000;">
+This text is displayed if your browser does not support HTML5 Canvas.
+</canvas>
+<script type="text/javascript" src="gl-matrix.js"></script>
+<script type="text/javascript" src="Istela.js"></script>
+
+
+<script type="text/javascript">
+var canvas;
+var ctx;
+var id;
+
+function doKeyDown(evt)
+{
+switch (evt.keyCode) {
+
+case 27:  /* Escape was pressed */
+//console.log("Sound Stopping!");
+michel.stop();
+ANIMATION++;
+if ((player.sprites.length-1)<ANIMATION)
+{
+	ANIMATION = 0;
+}
+player.currentAnim = ANIMATION;
+break;
+
+case 13:  /* Enter was pressed */
+//console.log("Sound Playing!");
+michel.play();
+break;
+
+case 38:  /* Up arrow was pressed */
+//console.log("Up Arrow Down!");
+player.move(0,-5);
+BOOM.move(0,-5);
+break;
+
+case 40:  /* Down arrow was pressed */
+//console.log("Down Arrow Down!");
+player.move(0,5);
+BOOM.move(0,5);
+break;
+
+case 37:  /* Left arrow was pressed */
+//console.log("Left Arrow Down!")
+player.move(-5,0);
+BOOM.move(-5,0);
+break;
+
+case 39:  /* Right arrow was pressed */
+//console.log("Right Arrow Down!");
+player.move(5,0);
+BOOM.move(5,0);
+break;
+
+}
+}
+
+function OnMouseMove(e)
+{
+	var rect = canvas.getBoundingClientRect();
+	var x = e.clientX - rect.left;
+	var y = e.clientY - rect.top;
+	//console.log("x: "+x+","+"y: "+y);
+	player.cx = x;
+	player.cy = y;
+}
+
+function doMouseDown(e)
+{
+	var rect = canvas.getBoundingClientRect();
+	var x = e.clientX - rect.left;
+	var y = e.clientY - rect.top;
+	//console.log("x: "+x+","+"y: "+y);
+	player.cx = x;
+	player.cy = y;
+}
+
+
+function main_loop(t)
+{
+	var thisTime = t;
+	var delta = thisTime - lastTime;
+	lastTime = thisTime;
+	window.requestAnimationFrame(main_loop);
+	ENGINE.clear();
+	if(!slash.enable)
+	{
+		BG1.update();
+		BG2.update();
+		BG3.update();
+		BG4.update();
+		BG5.update();
+		player.update(delta);
+		BOOM.update(delta);
+		PHYSICS.out_of_canvas_basic_physics_solver();
+		RENDER.renderAll();
+		//console.log(t);
+	}
+	slash.update(delta);
+	slash.draw();
+}
+
+var lastTime = 0;
+var michel = new SOUND_CLASS("careless.mp3");
+var player_shape = new box_shape(100,200);
+var ANIMATION = 0;
+
+ENGINE.init();
+
+var slash = new SScreen_class('CMG.png',4000,canvas)
+
+var BG1 = new SINGLE_BG_LAYER_CLASS('plx-1.png',canvas,1.8);
+var BG2 = new SINGLE_BG_LAYER_CLASS('plx-2.png',canvas,1.8);
+var BG3 = new SINGLE_BG_LAYER_CLASS('plx-3.png',canvas,1.8);
+var BG4 = new SINGLE_BG_LAYER_CLASS('plx-4.png',canvas,1.8);
+var BG5 = new SINGLE_BG_LAYER_CLASS('plx-5.png',canvas,1.8);
+
+BG1.speed = -1;
+BG2.speed = -2;
+BG3.speed = -3;
+BG4.speed = -4;
+BG5.speed = -5;
+
+//BG1.imgScale = 1.8;
+//BG2.imgScale = 1.8;
+//BG3.imgScale = 1.8;
+//BG4.imgScale = 1.8;
+//BG5.imgScale = 1.8;
+
+var CAT = new SPRITE_SHEET("cat1.png",4,2,8,1000);
+CAT.scale = 0.1;
+var RUN = new SPRITE_SHEET("run.png",3,2,6,1000);
+RUN.scale = 0.1;
+var KNIFE = new SPRITE_SHEET("knife.png",2,2,4,1000);
+KNIFE.scale = 0.1;
+var FIRE = new SPRITE_SHEET("shot.png",2,2,4,1000);
+FIRE.scale = 0.1;
+var boomAnim = new SPRITE_SHEET("boom.png",8,1,8,1000);
+boomAnim.scale = 0.5;
+
+
+var player = new GAME_OBJECT(player_shape,canvas.width/2,canvas.height/2,false,"Belicoff");
+var BOOM = new GAME_OBJECT(player_shape,canvas.width/2,canvas.height/2,false,"Atomic");
+
+
+player.debug = true;
+BOOM.debug = true;
+player.addAnimation(CAT);
+player.addAnimation(RUN);
+player.addAnimation(KNIFE);
+player.addAnimation(FIRE);
+player.currentAnim = 0;
+BOOM.addAnimation(boomAnim);
+window.addEventListener('keydown',doKeyDown,true);
+canvas.addEventListener('mousemove', OnMouseMove, false);
+canvas.addEventListener("mousedown", doMouseDown, false);
+window.requestAnimationFrame(main_loop);
+</script>
+</body>
+</html>
